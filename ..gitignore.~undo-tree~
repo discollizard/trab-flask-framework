@@ -1,0 +1,6 @@
+(undo-tree-save-format-version . 1)
+"44e6e1adc1b1cd701232fe4c342efd393ee03f1c"
+[nil nil nil nil (25323 22602 81255 0) 0 nil]
+([nil nil (("~" . -9) (undo-tree-id0 . -1) 10 (7 . 10) (6 . 7) (t 25320 36599 0 0) 1) nil (25323 22602 81251 0) 0 nil])
+([nil current ((10 . 12) (t 25323 22602 0 0)) nil (25323 23493 25289 0) 0 nil])
+nil
