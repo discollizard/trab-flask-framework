@@ -1,7 +1,16 @@
 from flask import Flask, render_template, request
+from flask_sqlalchemy import SQLAlchemy
 from markupsafe import escape
+from sql_config import user, database, server, password 
+import build
 
 app = Flask(__name__)
+
+
+app.config['SQLALCHEMY_DATABASE_URI'] = f'mysql://{user}:{password}@{server}:3306/{database}'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+db = SQLAlchemy(app)
 
 @app.route("/")
 def index():
