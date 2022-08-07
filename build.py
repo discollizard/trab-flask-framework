@@ -1,27 +1,41 @@
-from flask import Flask, render_template, request
+from flask import Flask, request
 from flask_sqlalchemy import SQLAlchemy
 from markupsafe import escape
 from sql_config import user, database, server, password 
 
-app = Flask(__name__)
+app = Flask('FastCompra')
 
 # SETTING UP SQLALCHEMY PARAMETERS
 app.config['SQLALCHEMY_DATABASE_URI'] = f'mysql://{user}:{password}@{server}:3306/{database}'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-
 
 # INSTANTIATING DB HANDLER
 db = SQLAlchemy(app)
 
 
 # IMPORTING MODELS
-import usuario
-import categoria
-import anuncio
-import favorito
-import compra
-import pergunta
-import resposta
+from usuario import Usuario
+from categoria import Categoria
+from anuncio import Anuncio
+from favorito import Favorito
+from compra import Compra
+from pergunta import Pergunta
+from resposta import Resposta
+
+# PUTTING CATEGORIES INTO DATABASE ONLY FOR THE FIRST TIME RUNNING
+queryAllCategoria = Categoria.query.all()
+if len(queryAllCategoria) == 0:
+    categorias = [
+        'Eletronicos',
+        'Vestuario',
+        'Moveis',
+        'Livros'
+    ]
+    for categoria in categorias:
+        categoria = Categoria(categoria)
+        db.session.add(categoria)
+    db.session.commit()
+
 
 # CREATING TABLES
 db.create_all()

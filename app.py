@@ -1,16 +1,14 @@
-from flask import Flask, render_template, request
-from flask_sqlalchemy import SQLAlchemy
-from markupsafe import escape
-from sql_config import user, database, server, password 
-import build
+from build import app, db
+from flask import render_template, request, redirect, url_for
 
-app = Flask(__name__)
-
-
-app.config['SQLALCHEMY_DATABASE_URI'] = f'mysql://{user}:{password}@{server}:3306/{database}'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-
-db = SQLAlchemy(app)
+# IMPORTING MODELS
+from usuario import Usuario
+from categoria import Categoria
+from anuncio import Anuncio
+from favorito import Favorito
+from compra import Compra
+from pergunta import Pergunta
+from resposta import Resposta
 
 @app.route("/")
 def index():
@@ -21,19 +19,26 @@ def index():
 def pag_login():
     return render_template("login.html")
 
-@app.route("/login/submit")
+@app.route("/login/submit", methods=['POST'])
 def login():
-    print("logar")
-    return ""
+    print(request.form)
+    return request.form
 
 @app.route("/cad/usuario")
 def pag_cad_usuario():
-    return render_template("cad_usuario.html")
+    return  render_template('cad_usuario.html')
 
-@app.route("/cad/usuario/submit")
+@app.route("/cad/usuario/submit", methods=['POST'])
 def cad_usuario():
-    print("usuario cadastrado")
-    return ""
+    usuario = Usuario(request.form.get('nome'), request.form.get('email'), request.form.get('senha'))
+    db.session.add(usuario)
+    db.session.commit()
+    return redirect(url_for('pag_login'))
+
+# -- HOME --
+@app.route("/home")
+def pag_home():
+    return render_template("home.html")
 
 # -- ANUNCIOS --
 
