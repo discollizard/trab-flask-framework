@@ -10,3 +10,12 @@ class Usuario(db.Model):
     nome = db.Column('nome', db.String(45))
     senha = db.Column('senha', db.String(255))
     email = db.Column('email', db.String(90))
+
+    def is_authenticated(self):
+        return true
+    def is_active(self):
+        return true
+    def is_anonymous(self):
+        return true
+    def get_id(self):
+        return str(self.id_usuario)

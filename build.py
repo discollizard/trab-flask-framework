@@ -1,4 +1,7 @@
-from flask import Flask, request
+from flask import (Flask, render_template, request, redirect)
+from flask_login import (current_user,
+LoginManager, login_user, logout_user, login_required)
+
 from flask_sqlalchemy import SQLAlchemy
 from markupsafe import escape
 from sql_config import user, database, server, password 
@@ -8,9 +11,15 @@ app = Flask('FastCompra')
 # SETTING UP SQLALCHEMY PARAMETERS
 app.config['SQLALCHEMY_DATABASE_URI'] = f'mysql://{user}:{password}@{server}:3306/{database}'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.secret_key = 'paçoca'
 
 # INSTANTIATING DB HANDLER
 db = SQLAlchemy(app)
+
+# INSTANTIATING LOGIN MANAGER
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = 'login/submit'
 
 
 # IMPORTING MODELS

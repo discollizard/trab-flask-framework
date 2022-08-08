@@ -33,17 +33,17 @@
       <div class="w-50 mx-auto mt-5">
         <form action="{{ url_for('cad_usuario') }}" method="POST">
           <div class="form-outline mb-4">
-            <input type="text" class="form-control" name="nome" />
+            <input type="text" required class="form-control" name="nome" />
             <label class="form-label" for="form2Example1">Nome</label>
           </div>
 
           <div class="form-outline mb-4">
-            <input type="email" class="form-control" name="email" />
+            <input type="email" required class="form-control" name="email" />
             <label class="form-label" for="form2Example1">Endereço de e-mail</label>
           </div>
 
           <div class="form-outline mb-4">
-            <input type="password" name="senha" id="form2Example2" class="form-control" />
+            <input type="password" required name="senha" id="form2Example2" class="form-control" />
             <label class="form-label" for="form2Example2">Senha</label>
           </div>
 

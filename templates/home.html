@@ -21,19 +21,13 @@
     <header>
       <div class="collapse bg-warning" id="navbarHeader">
         <div class="container">
-          <div class="row">
-            <div class="col-sm-8 col-md-7 py-4">
-              <h4 class="text-white">About</h4>
-              <p class="text-muted">Add some information about the album below, the author, or any other background context. Make it a few sentences long so folks can pick up some informative tidbits. Then, link them off to some social networking sites or contact information.</p>
-            </div>
-            <div class="col-sm-4 offset-md-1 py-4">
-              <h4 class="text-white">Contact</h4>
-              <ul class="list-unstyled">
-                <li><a href="#" class="text-white">Follow on Twitter</a></li>
-                <li><a href="#" class="text-white">Like on Facebook</a></li>
-                <li><a href="#" class="text-white">Email me</a></li>
-              </ul>
-            </div>
+          <div class="container d-flex justify-content-between text-center">
+            <a class="text-dark" href="{{ url_for('pag_anuncios_por_categoria') }}">Anúncios por categoria</a>
+            <a class="text-dark" href="{{ url_for('pag_anunciar') }}">Cadastrar anúncio</a>
+            <a class="text-dark" href="{{ url_for('favoritos') }}">Favoritos</a>
+            <a class="text-dark" href="{{ url_for('pag_relatorios_compra') }}">Relatório de compras</a>
+            <a class="text-dark" href="{{ url_for('pag_relatorios_venda') }}">Relatório de vendas</a>
+            <a class="text-dark" href="/logout/1">Sair</a>
           </div>
         </div>
       </div>
@@ -50,15 +44,13 @@
     </header>
 
     <main role="main">
-
-      <div class="py-5 bg-light">
-        <div class="container d-flex flex-column text-center">
-          <a class="text-dark" href="{{ url_for('pag_anuncios_por_categoria') }}">Anúncios por categoria</a>
-          <a class="text-dark" href="{{ url_for('pag_anunciar') }}">Cadastrar anúncio</a>
-          <a class="text-dark" href="{{ url_for('favoritos') }}">Favoritos</a>
-          <a class="text-dark" href="{{ url_for('pag_relatorios_compra') }}">Relatório de compras</a>
-          <a class="text-dark" href="{{ url_for('pag_relatorios_venda') }}">Relatório de vendas</a>
+      {% if mensagem_sucesso %}
+        <div class="bg-success py-2 text-center">
+          <span class="text-white">{{ mensagem_sucesso }}</span>
         </div>
+      {% endif %}
+      <div class="py-5 bg-light">
+
       </div>
 
     </main>
