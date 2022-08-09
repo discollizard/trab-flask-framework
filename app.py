@@ -12,6 +12,8 @@ from compra import Compra
 from pergunta import Pergunta
 from resposta import Resposta
 
+import hashlib
+
 # -- PÁGINAS INICIAL E DE ERRO --
 @app.route("/")
 def index():
@@ -21,7 +23,7 @@ def index():
 def pagina_nao_encontrada(error):
     return render_template("not_found.html")
 
-# -- LOGIN E CADASTRO -- 
+# -- LOGIN E OPERAÇÕES DE USUÁRIO -- 
 @app.route("/login")
 def pag_login():
     return render_template("login.html")
@@ -33,8 +35,8 @@ def load_user(id):
 @app.route("/login/submit", methods=['POST'])
 def login():
     email = request.form.get('email')
-    senha = request.form.get('senha')
-    user = Usuario.query.filter_by(email=email, senha=senha).first()
+    hash = hashlib.sha512(str(request.form.get('senha')).encode("utf-8")).hexdigest()
+    user = Usuario.query.filter_by(email=email, senha=hash).first()
 
     if(user):
         login_user(user)
@@ -44,24 +46,50 @@ def login():
 
     return request.form
 
-@app.route("/logout/<id_usuario>")
-def logout(id_usuario):
-    print(id_usuario)
-    return "123"
+@app.route("/logout")
+def logout():
+    logout_user()
+    return redirect(url_for('index'))
 
 @app.route("/cad/usuario")
 def pag_cad_usuario():
     return  render_template('cad_usuario.html')
 
+@app.route("/opcoes-usuario")
+@login_required
+def opcoes_usuario():
+    user = current_user
+    return  render_template('opt_usuario.html', user=user)
+
+@app.route("/alt/usuario", methods=['POST'])
+def alt_usuario():
+    user = current_user
+    hash = hashlib.sha512(str(request.form.get('senha')).encode("utf-8")).hexdigest()
+    user.nome = request.form.get('nome')
+    user.email = request.form.get('email')
+    user.senha = hash
+    db.session.commit()
+    return redirect(url_for('pag_home', mensagem_sucesso='Dados cadastrais alterados.'))
+
+@app.route("/del/usuario")
+def del_usuario():
+    user = current_user
+    db.session.delete(user)
+    db.session.commit()
+    return redirect('/')
+    
+
 @app.route("/cad/usuario/submit", methods=['POST'])
 def cad_usuario():
-    usuario = Usuario(request.form.get('nome'), request.form.get('email'), request.form.get('senha'))
+    hash = hashlib.sha512(str(request.form.get('senha')).encode("utf-8")).hexdigest()
+    usuario = Usuario(request.form.get('nome'), request.form.get('email'), hash)
     db.session.add(usuario)
     db.session.commit()
     return redirect(url_for('pag_login'))
 
 # -- HOME --
 @app.route("/home")
+@login_required
 def pag_home():
     if 'mensagem_sucesso' in request.args:
         return render_template("home.html", mensagem_sucesso=request.args['mensagem_sucesso'], id_usuario=1)
@@ -70,11 +98,13 @@ def pag_home():
 # -- ANUNCIOS --
 
 @app.route("/cad/anuncios")
+@login_required
 def pag_anunciar():
     categorias = Categoria.query.all()
     return render_template("cad_anuncio.html", categorias=categorias)
 
 @app.route("/cad/anuncios/submit", methods=['POST'])
+@login_required
 def anunciar():
     anuncio = Anuncio(
         request.form.get('nome'),
@@ -87,41 +117,50 @@ def anunciar():
     return redirect(url_for("pag_home", mensagem_sucesso="Anúncio cadastrado com sucesso"))
 
 @app.route("/anuncios")
+@login_required
 def pag_anuncios_por_categoria():
     return render_template("anuncios_por_categoria.html")
 
 @app.route("/anuncio/<anuncio_id>")
+@login_required
 def pag_anuncio_por_id():
     return render_template("anuncio.html")
 
 @app.route("/anuncios/<anuncio_id>/perguntar")
+@login_required
 def perguntar():
     print("perguntado")
     return render_template("anuncio.html")
 
 @app.route("/anuncios/<anuncio_id>/responder")
+@login_required
 def responder():
     print("respondido")
     return render_template("anuncio.html")
 
 @app.route("/anuncios/<anuncio_id>/favoritos")
+@login_required
 def favoritar():
     print("produto adicionado aos favoritos")
     return ""
 
 @app.route("/anuncios/compra")
+@login_required
 def comprar():
     print("produto comprado")
     return ""
 
 @app.route("/favoritos")
+@login_required
 def favoritos():
    return render_template("favoritos.html") 
 
 @app.route("/relatorios/vendas")
+@login_required
 def pag_relatorios_venda():
     return render_template("relatorio_venda.html")
 
 @app.route("/relatorios/compras")
+@login_required
 def pag_relatorios_compra():
     return render_template("relatorio_compra.html")
