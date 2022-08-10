@@ -10,6 +10,13 @@
     <title>FastCompra - A sua loja, online!</title>
 
     <link rel="canonical" href="https://getbootstrap.com/docs/4.0/examples/album/">
+    <style>
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 10px;
+      }
+    </style>
 
     <!-- Bootstrap core CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N" crossorigin="anonymous">
@@ -50,8 +57,20 @@
           <span class="text-white">{{ mensagem_sucesso }}</span>
         </div>
       {% endif %}
-      <div class="py-5 bg-light">
-
+      <section class="py-5 bg-light">
+       <h1 class="text-center">Últimos anúncios</h1> 
+      </section>
+      <div class="grid w-75 mx-auto">
+        {% for anuncio in anuncios %}
+        <div class="card col-xs-4" style="width: 18rem;">
+          <div class="card-body">
+            <h4 class="card-title">{{anuncio[0].nome_produto}}</h4>
+            <p>{{anuncio[1]}}</p>
+            <h5 class="card-text font-bold mt-4">R${{anuncio[0].preco_produto}}</h5>
+            <a href="/anuncio/{{anuncio[0].id_anuncio}}" class="mt-5 btn btn-primary">Ver anúncio</a>
+          </div>
+        </div>
+        {% endfor %}
       </div>
 
     </main>

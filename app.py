@@ -91,9 +91,14 @@ def cad_usuario():
 @app.route("/home")
 @login_required
 def pag_home():
+    todos_anuncios = Anuncio.query\
+    .join(Categoria, Categoria.id_categoria == Categoria.id_categoria)\
+    .add_columns(Categoria.nome_categoria)\
+    .group_by(Anuncio.id_anuncio)\
+    .all()
     if 'mensagem_sucesso' in request.args:
-        return render_template("home.html", mensagem_sucesso=request.args['mensagem_sucesso'], id_usuario=1)
-    return render_template("home.html", id_usuario=1)
+        return render_template("home.html", mensagem_sucesso=request.args['mensagem_sucesso'], id_usuario=1, anuncios=todos_anuncios)
+    return render_template("home.html", id_usuario=1, anuncios=todos_anuncios)
 
 # -- ANUNCIOS --
 
@@ -123,8 +128,10 @@ def pag_anuncios_por_categoria():
 
 @app.route("/anuncio/<anuncio_id>")
 @login_required
-def pag_anuncio_por_id():
-    return render_template("anuncio.html")
+def pag_anuncio_por_id(anuncio_id):
+    anuncio_para_mostrar = Anuncio.query.filter_by(id_anuncio=anuncio_id).first()
+    mostrar_opcoes_do_dono = current_user.id_usuario == anuncio_para_mostrar.id_usuario
+    return render_template("anuncio.html", anuncio=anuncio_para_mostrar, mostrar_opcoes_do_dono=mostrar_opcoes_do_dono)
 
 @app.route("/anuncios/<anuncio_id>/perguntar")
 @login_required
