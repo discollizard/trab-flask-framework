@@ -73,7 +73,11 @@ def alt_usuario():
 
 @app.route("/del/usuario")
 def del_usuario():
+    todos_anuncios_deste_usuario = Anuncio.__table__.delete().where(Anuncio.id_usuario==current_user.id_usuario)
+    todos_favoritos_deste_usuario = Favorito.__table__.delete().where(Favorito.usuario_id_usuario==current_user.id_usuario)
     user = current_user
+    db.session.execute(todos_anuncios_deste_usuario)
+    db.session.execute(todos_favoritos_deste_usuario)
     db.session.delete(user)
     db.session.commit()
     return redirect('/')
@@ -115,11 +119,22 @@ def anunciar():
         request.form.get('nome'),
         request.form.get('preco'),
         request.form.get('qtd'),
-        request.form.get('categoria')
+        request.form.get('categoria'),
+        current_user.id_usuario
     )
     db.session.add(anuncio)
     db.session.commit()
     return redirect(url_for("pag_home", mensagem_sucesso="Anúncio cadastrado com sucesso"))
+
+@app.route("/del/anuncio/<id_anuncio>")
+@login_required
+def deletar_anuncio(id_anuncio):
+    todos_favoritos_deste_anuncio = Favorito.__table__.delete().where(Favorito.anuncio_id_anuncio==id_anuncio)
+    anuncio_para_deletar = Anuncio.query.filter_by(id_anuncio=id_anuncio).first()
+    db.session.execute(todos_favoritos_deste_anuncio)
+    db.session.delete(anuncio_para_deletar)
+    db.session.commit()
+    return redirect(url_for("pag_home", mensagem_sucesso="Anúncio deletado com sucesso"))
 
 @app.route("/anuncios")
 @login_required
@@ -145,11 +160,15 @@ def responder():
     print("respondido")
     return render_template("anuncio.html")
 
-@app.route("/anuncios/<anuncio_id>/favoritos")
+@app.route("/favoritar/<id_anuncio>")
 @login_required
-def favoritar():
-    print("produto adicionado aos favoritos")
-    return ""
+def favoritar(id_anuncio):
+    try:
+        novo_favorito = Favorito(current_user.id_usuario, id_anuncio)
+        db.session.add(novo_favorito)
+        db.session.commit()
+    finally:
+        return redirect(url_for('favoritos'))
 
 @app.route("/anuncios/compra")
 @login_required
@@ -160,7 +179,22 @@ def comprar():
 @app.route("/favoritos")
 @login_required
 def favoritos():
-   return render_template("favoritos.html") 
+    anuncios_favoritos = Anuncio.query\
+    .join(Categoria, Categoria.id_categoria == Categoria.id_categoria)\
+    .join(Favorito, Favorito.anuncio_id_anuncio == Anuncio.id_anuncio)\
+    .filter(Favorito.usuario_id_usuario == current_user.id_usuario)\
+    .add_columns(Categoria.nome_categoria)\
+    .group_by(Anuncio.id_anuncio)\
+    .all()
+    return render_template("favoritos.html", anuncios=anuncios_favoritos) 
+
+@app.route("/favoritos/<id_anuncio>/deletar")
+@login_required
+def deletar_favorito(id_anuncio):
+    favorito_para_deletar = Favorito.query.filter_by(usuario_id_usuario=current_user.id_usuario, anuncio_id_anuncio=id_anuncio).first()
+    db.session.delete(favorito_para_deletar)
+    db.session.commit()
+    return redirect(url_for('favoritos'))
 
 @app.route("/relatorios/vendas")
 @login_required
