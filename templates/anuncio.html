@@ -77,11 +77,17 @@
           {% for pergunta in perguntas %}
           <div>
             <div class="border rounded px-2 py-3">
-                <span class="d-block w-100">{{pergunta[0].texto}}</span> 
+                <div class="d-flex justify-content-between">
+                  <span class="d-block">{{pergunta[0].texto}}</span> 
+                  {% if pergunta[0].usuario_id_usuario == current_user.id_usuario %}
+                  <a class="fa fa-x mt-1 text-danger" href="/deletar/{{anuncio.id_anuncio}}/pergunta/{{pergunta[0].id_pergunta}}"></a> 
+                  {% endif %}
+                </div>
                 {% if mostrar_opcoes_do_dono %}
                 <hr />
                 <form action="/responder" method="post">
-                  <input type="hidden" name="id_pergunta" value="{{pergunta[0].pergunta_id_pergunta}}">
+                  <input type="hidden" name="id_anuncio" value="{{anuncio.id_anuncio}}">
+                  <input type="hidden" name="id_pergunta" value="{{pergunta[0].id_pergunta}}">
                   <span class="d-block w-100">Responder</span>
                   <textarea name="resposta" style="width: 100%;"></textarea>
                   <input type="submit" value="Enviar resposta" class="btn btn-success mt-2">
@@ -90,8 +96,11 @@
             </div>
             <small>{{pergunta.nome}}</small>
             {% for resposta in pergunta[0].respostas %}
-              <div class="text-right">
-                R: {{resposta.texto}}
+              <div class="d-flex justify-content-between">
+                <span>R: {{resposta.texto}}</span>
+                  {% if mostrar_opcoes_do_dono %}
+                  <a class="fa fa-x text-danger" href="/deletar/{{anuncio.id_anuncio}}/resposta/{{resposta.id_resposta}}"></a> 
+                  {% endif %}
               </div>
             {% endfor %}
           </div>
