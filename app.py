@@ -145,20 +145,42 @@ def pag_anuncios_por_categoria():
 @login_required
 def pag_anuncio_por_id(anuncio_id):
     anuncio_para_mostrar = Anuncio.query.filter_by(id_anuncio=anuncio_id).first()
+    perguntas_do_anuncio = Pergunta.query.filter_by(anuncio_id_anuncio=anuncio_id)\
+    .join(Usuario, Pergunta.usuario_id_usuario == Usuario.id_usuario)\
+    .add_columns(Usuario.nome)
+    print(perguntas_do_anuncio)
+    # for pergunta in perguntas_do_anuncio:
+    #     pergunta.autor_da_pergunta = (Usuario.query.filter_by(id_usuario=pergunta.usuario_id_usuario).first()).nome
+    #     pergunta.respostas = Resposta.query.filter_by(pergunta_id_pergunta=pergunta.id_pergunta)
     mostrar_opcoes_do_dono = current_user.id_usuario == anuncio_para_mostrar.id_usuario
-    return render_template("anuncio.html", anuncio=anuncio_para_mostrar, mostrar_opcoes_do_dono=mostrar_opcoes_do_dono)
+    return render_template("anuncio.html", anuncio=anuncio_para_mostrar, perguntas=perguntas_do_anuncio, mostrar_opcoes_do_dono=mostrar_opcoes_do_dono)
 
-@app.route("/anuncios/<anuncio_id>/perguntar")
+@app.route("/perguntar", methods=['POST'])
 @login_required
 def perguntar():
-    print("perguntado")
-    return render_template("anuncio.html")
+    pergunta = request.form.get('pergunta') 
+    id_anuncio = request.form.get('id_anuncio') 
+    nova_pergunta = Pergunta(current_user.id_usuario, id_anuncio, pergunta)
+    db.session.add(nova_pergunta)
+    db.session.commit()
+    return redirect(url_for("pag_anuncio_por_id", anuncio_id = id_anuncio))
+
 
 @app.route("/anuncios/<anuncio_id>/responder")
 @login_required
 def responder():
     print("respondido")
     return render_template("anuncio.html")
+
+@app.route("/comprar/<id_anuncio>")
+@login_required
+def comprar(id_anuncio):
+    anuncio_para_remover_qtd = Anuncio.query.filter_by(id_anuncio=id_anuncio).first()
+    anuncio_para_remover_qtd.qtd_disponivel = anuncio_para_remover_qtd.qtd_disponivel - 1 
+    nova_compra = Compra(current_user.id_usuario, id_anuncio)
+    db.session.add(nova_compra)
+    db.session.commit()
+    return redirect(url_for("pag_home", mensagem_sucesso="Compra efetuada com sucesso"))
 
 @app.route("/favoritar/<id_anuncio>")
 @login_required
@@ -169,12 +191,6 @@ def favoritar(id_anuncio):
         db.session.commit()
     finally:
         return redirect(url_for('favoritos'))
-
-@app.route("/anuncios/compra")
-@login_required
-def comprar():
-    print("produto comprado")
-    return ""
 
 @app.route("/favoritos")
 @login_required

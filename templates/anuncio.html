@@ -74,30 +74,47 @@
           </div>
           <hr />
           <h4>Perguntas</h4>
+          {% for pergunta in perguntas %}
           <div>
             <div class="border rounded px-2 py-3">
-              <span class="d-block w-100">produto muito bom, mas vem em verde?</span> 
-              {% if mostrar_opcoes_do_dono %}
-              <hr />
-              <span class="d-block w-100">Responder</span>
-              <textarea style="width: 100%;"></textarea>
-              <a href="/responder/[[pergunta_id]]" class="btn btn-success mt-2">Enviar resposta</a>
-              {% endif %}
+                <span class="d-block w-100">{{pergunta[0].texto}}</span> 
+                {% if mostrar_opcoes_do_dono %}
+                <hr />
+                <form action="/responder" method="post">
+                  <input type="hidden" name="id_pergunta" value="{{pergunta[0].pergunta_id_pergunta}}">
+                  <span class="d-block w-100">Responder</span>
+                  <textarea name="resposta" style="width: 100%;"></textarea>
+                  <input type="submit" value="Enviar resposta" class="btn btn-success mt-2">
+                </form>
+                {% endif %}
             </div>
-            <small>Jucicleisson da Silva</small>
-            <div class="text-right">
-              R: Tem sim!, posso mandar logo.
-            </div>
+            <small>{{pergunta.nome}}</small>
+            {% for resposta in pergunta[0].respostas %}
+              <div class="text-right">
+                R: {{resposta.texto}}
+              </div>
+            {% endfor %}
           </div>
+          {% endfor %}
           <hr />
           {% if not mostrar_opcoes_do_dono %}
           <div>
-            <span class="d-block w-100">Perguntar</span>
-            <textarea style="width: 100%;"></textarea>
-            <a href="/responder/[[pergunta_id]]" class="btn btn-success mt-2">Enviar pergunta</a>
+            <form action="/perguntar" method="POST">
+              <input type="hidden" name="id_anuncio" value="{{anuncio.id_anuncio}}">
+              <span class="d-block w-100">Perguntar</span>
+              <textarea name="pergunta" style="width: 100%;"></textarea>
+              <input type="submit" value="Enviar pergunta" class="btn btn-success mt-2">
+            </form>
+          </div>
+          {% endif %}
+          <hr />
+          {% if not mostrar_opcoes_do_dono %}
+          <div class="d-flex justify-content-center">
+            <a href="/comprar/{{anuncio.id_anuncio}}" class="btn btn-success mt-2">Comprar</a>
           </div>
           {% endif %}
         </div>
+       
       </section>
     </main>
 
