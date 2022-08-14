@@ -105,7 +105,7 @@ def cad_usuario():
 @login_required
 def pag_home():
     todos_anuncios = Anuncio.query\
-    .join(Categoria, Categoria.id_categoria == Categoria.id_categoria)\
+    .join(Categoria, Anuncio.id_categoria == Categoria.id_categoria)\
     .add_columns(Categoria.nome_categoria)\
     .group_by(Anuncio.id_anuncio)\
     .all()
@@ -123,9 +123,23 @@ def pag_anunciar():
 
 @app.route("/alt/anuncio/<id_anuncio>")
 @login_required
-def pag_anunciar():
+def pag_alterar_anuncio(id_anuncio):
     categorias = Categoria.query.all()
-    return render_template("cad_anuncio.html", categorias=categorias)
+    anuncio_para_alterar = Anuncio.query.filter_by(id_anuncio=id_anuncio).first()
+    return render_template("alt_anuncio.html", categorias=categorias, anuncio=anuncio_para_alterar)
+
+@app.route("/alt/anuncio/submit", methods=['POST'])
+@login_required
+def alterar_anuncio():
+    anuncio_para_alterar = Anuncio.query.filter_by(
+        id_anuncio=request.form.get('id_anuncio')
+    ).first()
+    anuncio_para_alterar.nome_produto=request.form.get('nome')
+    anuncio_para_alterar.qtd_disponivel=request.form.get('qtd')
+    anuncio_para_alterar.preco_produto=request.form.get('preco')
+    anuncio_para_alterar.id_categoria = request.form.get('categoria')
+    db.session.commit()
+    return redirect(url_for("pag_home", mensagem_sucesso="Anúncio alterado com sucesso"))
 
 @app.route("/cad/anuncios/submit", methods=['POST'])
 @login_required
@@ -254,9 +268,22 @@ def deletar_favorito(id_anuncio):
 @app.route("/relatorios/vendas")
 @login_required
 def pag_relatorios_venda():
-    return render_template("relatorio_venda.html")
+    vendas = Compra.query\
+    .join(Anuncio, Anuncio.id_anuncio == Compra.anuncio_id_anuncio)\
+    .join(Usuario, Usuario.id_usuario == Compra.usuario_id_usuario)\
+    .filter(Anuncio.id_usuario == current_user.id_usuario)\
+    .add_columns(Usuario.nome, Anuncio.nome_produto)\
+    .all()
+
+    return render_template("relatorio_venda.html", dados=vendas)
 
 @app.route("/relatorios/compras")
 @login_required
 def pag_relatorios_compra():
-    return render_template("relatorio_compra.html")
+    compras = Compra.query\
+    .join(Anuncio, Anuncio.id_anuncio == Compra.anuncio_id_anuncio)\
+    .join(Usuario, Usuario.id_usuario == Anuncio.id_usuario)\
+    .filter(Compra.usuario_id_usuario == current_user.id_usuario)\
+    .add_columns(Usuario.nome, Anuncio.nome_produto)\
+    .all()
+    return render_template("relatorio_compra.html", compras=compras)

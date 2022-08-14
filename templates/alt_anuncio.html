@@ -46,10 +46,11 @@
 
     <main role="main">
       <div class="w-50 mx-auto mt-5">
-        <h3 class="mx-auto">Anunciar produto</h3>
-        <form action="{{ url_for('anunciar') }}" method="POST">
+        <h3 class="mx-auto">Alterar anúncio</h3>
+        <form action="{{ url_for('alterar_anuncio') }}" method="POST">
+            <input type="hidden" name="id_anuncio" value="{{anuncio.id_anuncio}}">
           <div class="form-outline mb-4">
-            <input type="text" class="form-control" name="nome" />
+            <input type="text" class="form-control" value="{{anuncio.nome_produto}}" name="nome" />
             <label class="form-label" for="form2Example1">Nome</label>
           </div>
 
@@ -72,7 +73,7 @@
             <label class="form-label" for="form2Example2">Categoria do anúncio</label>
           </div>
 
-          <input type="submit" value="Cadastrar anúncio" class="btn btn-warning text-white btn-block mb-4">
+          <input type="submit" value="Alterar anúncio" class="btn btn-warning text-white btn-block mb-4">
         </form>
       </div>
     </main>
